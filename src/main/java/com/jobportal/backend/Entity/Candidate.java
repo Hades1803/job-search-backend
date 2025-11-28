@@ -18,7 +18,6 @@ public class Candidate {
     @Id
     private Integer id;
 
-
     @OneToOne
     @MapsId
     @JoinColumn(name = "id")
@@ -38,7 +37,6 @@ public class Candidate {
 
 
     private LocalDate birthDate;
-
 
     @Size(max = 200)
     private String avatar;
