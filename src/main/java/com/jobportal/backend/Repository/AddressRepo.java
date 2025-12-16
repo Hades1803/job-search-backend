@@ -2,6 +2,13 @@ package com.jobportal.backend.Repository;
 
 import com.jobportal.backend.Entity.Address;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
-public interface AddressRepo extends JpaRepository<Address,String> {
+import java.util.List;
+import java.util.Optional;
+
+@Repository
+public interface AddressRepo extends JpaRepository<Address, String> {
+    Optional<Address> findByName(String name);
+    List<Address> findAllByOrderByNameAsc();
 }

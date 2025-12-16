@@ -51,7 +51,7 @@ public class AppConstraints {
     // Role names (nên khớp với enum Role)
     public static final String ROLE_ADMIN = "ADMIN";
     public static final String ROLE_EMPLOYER = "EMPLOYER";
-    public static final String ROLE_JOB_SEEKER = "JOB_SEEKER";
+    public static final String ROLE_JOB_SEEKER = "CANDIDATE";
 
     // Private constructor to prevent instantiation
     private AppConstraints() {

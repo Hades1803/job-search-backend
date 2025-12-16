@@ -50,25 +50,23 @@ public class ForgotPasswordServiceImpl implements ForgotPasswordService {
 
     @Override
     public String resetPassword(ResetPasswordRequest request) {
-        Account account = accountRepo.findByEmail(request.getEmail())
-                .orElseThrow(() -> new EmailNotFoundException("Email không tồn tại"));
 
-        ForgotPassword fp = forgotPasswordRepo.findByAccount(account)
-                .orElseThrow(() -> new OtpInvalidException("Bạn chưa yêu cầu OTP"));
-
-        if (!fp.getOtp().equals(request.getOtp())) {
-            throw new OtpInvalidException("OTP không đúng");
-        }
+        ForgotPassword fp = forgotPasswordRepo.findByOtp(request.getOtp())
+                .orElseThrow(() -> new OtpInvalidException("OTP không đúng"));
 
         if (fp.getExpirationTime().before(new Date())) {
             throw new OtpExpiredException("OTP đã hết hạn");
         }
 
+        Account account = fp.getAccount();
+
         account.setPassword(passwordEncoder.encode(request.getNewPassword()));
         accountRepo.save(account);
 
+        // Xoá OTP sau khi dùng
         forgotPasswordRepo.delete(fp);
 
         return "Đổi mật khẩu thành công";
     }
+
 }
