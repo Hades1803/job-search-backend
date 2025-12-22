@@ -381,7 +381,13 @@ public class JobPostingServiceImpl implements JobPostingService {
         Account account = accountRepo.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy tài khoản"));
 
-        if (!account.getRole().getName().equals(AppConstraints.ROLE_EMPLOYER)) {
+        String roleName = String.valueOf(account.getRole().getName());
+
+        // Cho phép: EMPLOYER / ROLE_EMPLOYER / Employer
+        if (roleName == null ||
+                !roleName.equalsIgnoreCase(AppConstraints.ROLE_EMPLOYER) &&
+                        !roleName.equalsIgnoreCase("ROLE_" + AppConstraints.ROLE_EMPLOYER)) {
+
             throw new IllegalStateException("Tài khoản không phải nhà tuyển dụng");
         }
 

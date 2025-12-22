@@ -52,7 +52,7 @@ public class SecurityUtils {
      */
     public boolean isCandidate() {
         // Trong AppConstraints, ROLE_JOB_SEEKER = "CANDIDATE"
-        return hasRole(AppConstraints.ROLE_JOB_SEEKER);
+        return hasRole(AppConstraints.ROLE_CANDIDATE);
     }
 
     /**

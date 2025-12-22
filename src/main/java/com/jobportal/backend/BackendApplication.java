@@ -18,12 +18,14 @@ public class BackendApplication {
     public CommandLineRunner initRoles(RoleRepo roleRepo) {
         return args -> {
 
-            if (roleRepo.count() == 0) {
+            if (roleRepo.count() <= 2) {
                 roleRepo.save(new Role(101, RoleType.ADMIN));
                 roleRepo.save(new Role(102, RoleType.CANDIDATE));
                 roleRepo.save(new Role(103, RoleType.EMPLOYER));
 
                 System.out.println("Created default roles!");
+
+
             } else {
                 System.out.println("Roles already exist → skip");
             }

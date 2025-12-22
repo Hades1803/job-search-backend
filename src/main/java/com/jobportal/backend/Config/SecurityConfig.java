@@ -13,10 +13,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import static com.jobportal.backend.Config.AppConstraints.*;
-
 @Configuration
-@EnableMethodSecurity(prePostEnabled = true) // Bật @PreAuthorize
+@EnableMethodSecurity(prePostEnabled = true)
 @RequiredArgsConstructor
 public class SecurityConfig {
 
@@ -28,29 +26,19 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                         // Public endpoints
-                        .requestMatchers(PUBLIC_ENDPOINTS).permitAll()
+                        .requestMatchers(
+                                "/api/auth/**",
+                                "/api/public/**",
+                                "/api/job-postings/public/**",
+                                "/uploads/**",
+                                "/error"
+                        ).permitAll()
 
-                        // Job posting public endpoints
-                        .requestMatchers("/api/job-postings/public/**").permitAll()
-                        .requestMatchers("/uploads/**").permitAll()
-                        .requestMatchers("/error").permitAll()
+                        // SỬA: Dùng đúng authority name (không có "ROLE_" prefix)
+                        .requestMatchers("/api/admin/**").hasAuthority("ADMIN")
+                        .requestMatchers("/api/employer/**").hasAuthority("EMPLOYER")
+                        .requestMatchers("/api/candidate/**").hasAuthority("CANDIDATE")
 
-                        // Role-based endpoints
-                        .requestMatchers(ADMIN_ENDPOINTS).hasRole(ROLE_ADMIN)
-                        .requestMatchers(EMPLOYER_ENDPOINTS).hasRole(ROLE_EMPLOYER)
-                        .requestMatchers(JOB_SEEKER_ENDPOINTS).hasRole(ROLE_JOB_SEEKER)
-
-                        // Job posting employer endpoints
-                        .requestMatchers("/api/job-postings/employer/**").hasRole(ROLE_EMPLOYER)
-                        .requestMatchers("/api/job-postings/admin/**").hasRole(ROLE_ADMIN)
-
-                        // Candidate endpoints (tương đương job seeker)
-                        .requestMatchers("/api/candidate/**").hasRole(ROLE_JOB_SEEKER)
-
-                        // Common authenticated endpoints
-                        .requestMatchers(AUTHENTICATED_ENDPOINTS).authenticated()
-
-                        // Any other request must be authenticated
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);

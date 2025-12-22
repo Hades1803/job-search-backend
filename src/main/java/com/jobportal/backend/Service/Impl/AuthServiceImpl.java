@@ -2,15 +2,17 @@ package com.jobportal.backend.Service.Impl;
 
 import com.jobportal.backend.Dto.AuthRequest;
 import com.jobportal.backend.Dto.RegisterRequest;
-import com.jobportal.backend.Entity.Account;
-import com.jobportal.backend.Entity.Role;
+import com.jobportal.backend.Entity.*;
 import com.jobportal.backend.Repository.AccountRepo;
+import com.jobportal.backend.Repository.CandidateRepo;
+import com.jobportal.backend.Repository.EmployerRepo;
 import com.jobportal.backend.Repository.RoleRepo;
 import com.jobportal.backend.Security.JwtUtil;
 import com.jobportal.backend.Service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 
@@ -20,10 +22,13 @@ public class AuthServiceImpl implements AuthService {
 
     private final AccountRepo accountRepo;
     private final RoleRepo roleRepo;
+    private final CandidateRepo candidateRepo;
+    private final EmployerRepo employerRepo;
     private final PasswordEncoder passwordEncoder;
-    private final JwtUtil jwtUtil; // Changed from JwtService
+    private final JwtUtil jwtUtil;
 
     @Override
+    @Transactional
     public String register(RegisterRequest request) {
         // Check if email already exists
         if (accountRepo.findByEmail(request.getEmail()).isPresent()) {
@@ -33,14 +38,22 @@ public class AuthServiceImpl implements AuthService {
         Role role = roleRepo.findById(request.getRoleId())
                 .orElseThrow(() -> new IllegalArgumentException("Role not found"));
 
+        // Create account
         Account acc = new Account();
         acc.setEmail(request.getEmail());
         acc.setPassword(passwordEncoder.encode(request.getPassword()));
         acc.setRole(role);
         acc.setStatus(true);
         acc.setCreatedAt(LocalDateTime.now());
-        accountRepo.save(acc);
 
+        Account savedAccount = accountRepo.save(acc);
+
+        // Create profile based on role type
+        if (role.getName() == RoleType.CANDIDATE) {
+            createCandidateProfile(savedAccount);
+        } else if (role.getName() == RoleType.EMPLOYER) {
+            createEmployerProfile(savedAccount);
+        }
         return "Registration successful!";
     }
 
@@ -58,5 +71,19 @@ public class AuthServiceImpl implements AuthService {
         }
 
         return jwtUtil.generateToken(acc.getEmail());
+    }
+
+    private void createCandidateProfile(Account account) {
+        Candidate candidate = new Candidate();
+        candidate.setAccount(account);
+        // Tất cả các trường khác để null, sẽ cập nhật sau
+        candidateRepo.save(candidate);
+    }
+
+    private void createEmployerProfile(Account account) {
+        Employer employer = new Employer();
+        employer.setAccount(account);
+        // Tất cả các trường khác để null, sẽ cập nhật sau
+        employerRepo.save(employer);
     }
 }
