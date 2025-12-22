@@ -31,6 +31,7 @@ public class SecurityConfig {
                                 "/api/public/**",
                                 "/api/job-postings/public/**",
                                 "/uploads/**",
+                                "/api/job-postings/public/**",
                                 "/error"
                         ).permitAll()
 

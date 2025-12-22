@@ -1,4 +1,5 @@
 package com.jobportal.backend.Entity;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -22,6 +23,7 @@ public class JobPosting {
 
     @ManyToOne
     @JoinColumn(name = "employer_id", nullable = false)
+    @JsonIgnore
     private Employer employer;
 
 

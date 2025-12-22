@@ -43,9 +43,12 @@ public class JobPostingServiceImpl implements JobPostingService {
 
     @Override
     public JobPosting createJobPosting(JobPostingRequest request) {
-        if (!securityUtils.isEmployer()) {
+        boolean isEmployer = securityUtils.isEmployer();
+        log.info("DEBUG isEmployer = {}", isEmployer);
+        if (securityUtils.isEmployer()) {
             throw new AccessDeniedException("Chỉ nhà tuyển dụng mới được đăng bài tuyển dụng");
         }
+
 
         Employer employer = getCurrentEmployer();
 
@@ -118,15 +121,63 @@ public class JobPostingServiceImpl implements JobPostingService {
         JobPosting job = jobPostingRepo.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy bài đăng tuyển dụng ID: " + id));
 
-        if (securityUtils.isEmployer()) {
+        log.info("User role check - isEmployer: {}, isAdmin: {}",
+                !securityUtils.isEmployer(), securityUtils.isAdmin());
+
+        // Kiểm tra quyền
+        if (!securityUtils.isEmployer()) {
+            // Employer: chỉ được sửa bài của mình
             Employer employer = getCurrentEmployer();
             if (!job.getEmployer().getId().equals(employer.getId())) {
                 throw new AccessDeniedException("Bạn chỉ có thể chỉnh sửa bài đăng của mình");
             }
-        } else if (!securityUtils.isAdmin()) {
+
+            // Employer được update tất cả thông tin
+            return updateJobDetails(job, request);
+
+        } else if (securityUtils.isAdmin()) {
+            // Admin: chỉ được thay đổi status
+            log.info("Admin updating job - chỉ thay đổi status");
+
+            // Kiểm tra xem admin có cố gắng sửa thông tin khác không
+            if (hasNonStatusChanges(request)) {
+                throw new AccessDeniedException("Admin chỉ được thay đổi trạng thái bài đăng");
+            }
+
+            // Chỉ update status nếu có trong request
+            if (request.getStatus() != null) {
+                job.setStatus(request.getStatus());
+            }
+
+            return jobPostingRepo.save(job);
+
+        } else {
+            // Không phải employer hoặc admin
             throw new AccessDeniedException("Bạn không có quyền chỉnh sửa bài đăng này");
         }
+    }
 
+    private boolean hasNonStatusChanges(JobPostingRequest request) {
+        // Kiểm tra xem request có chứa thông tin khác status không
+        return request.getJobTitle() != null ||
+                request.getWorkAddress() != null ||
+                request.getQuantity() != null ||
+                request.getGenderRequirement() != null ||
+                request.getJobDescription() != null ||
+                request.getCandidateRequirement() != null ||
+                request.getRelatedSkills() != null ||
+                request.getBenefits() != null ||
+                request.getExpirationDate() != null ||
+                request.getNote() != null ||
+                request.getMajorId() != null ||
+                request.getJobTypeId() != null ||
+                request.getSalaryLevelId() != null ||
+                request.getRankId() != null ||
+                request.getAddressId() != null;
+    }
+
+    private JobPosting updateJobDetails(JobPosting job, JobPostingRequest request) {
+        // Validation
         if (request.getExpirationDate() != null &&
                 request.getExpirationDate().isBefore(LocalDateTime.now())) {
             throw new IllegalArgumentException("Ngày hết hạn phải sau thời điểm hiện tại");
@@ -143,7 +194,8 @@ public class JobPostingServiceImpl implements JobPostingService {
         if (request.getBenefits() != null) job.setBenefits(request.getBenefits());
         if (request.getExpirationDate() != null) job.setExpirationDate(request.getExpirationDate());
         if (request.getNote() != null) job.setNote(request.getNote());
-//        if (request.getStatus() != null) job.setStatus(request.getStatus());
+        // Employer không được tự ý thay đổi status
+        // if (request.getStatus() != null) job.setStatus(request.getStatus());
 
         // Update reference entities
         if (request.getMajorId() != null) {
@@ -203,7 +255,7 @@ public class JobPostingServiceImpl implements JobPostingService {
 
     @Override
     public List<JobPosting> getMyJobPostings() {
-        if (!securityUtils.isEmployer()) {
+        if (securityUtils.isEmployer()) {
             throw new AccessDeniedException("Chỉ nhà tuyển dụng mới có thể xem danh sách bài đăng của mình");
         }
 
@@ -310,7 +362,7 @@ public class JobPostingServiceImpl implements JobPostingService {
 
     @Override
     public JobPosting toggleJobPostingStatus(Integer id) {
-        if (!securityUtils.isAdmin()) {
+        if (securityUtils.isAdmin()) {
             throw new AccessDeniedException("Chỉ quản trị viên mới có thể thay đổi trạng thái bài đăng");
         }
 

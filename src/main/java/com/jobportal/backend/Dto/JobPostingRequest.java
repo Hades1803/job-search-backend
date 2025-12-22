@@ -20,7 +20,7 @@ public class JobPostingRequest {
     private String benefits;
     private LocalDateTime expirationDate;
     private String note;
-
+    private Boolean status;
     // Đổi từ Integer thành String (vì ID là String)
     private String majorId;
     private String jobTypeId;
