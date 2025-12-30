@@ -19,6 +19,6 @@ public class AuthResponse {
     private String tokenType;
     private String email;
     private String role;
-    private Long expiresIn; // in seconds
+    private Long expiresIn;
     private String message;
 }

@@ -21,7 +21,7 @@ public class ForgotPassword {
     private Integer otp;
     @Column(nullable = false)
     private Date expirationTime;
-
+    private Boolean verified = false;
     @OneToOne
     private Account account ;
 

@@ -25,7 +25,7 @@ public class ForgotPasswordServiceImpl implements ForgotPasswordService {
     private final PasswordEncoder passwordEncoder;
     private final EmailService emailService;
 
-    private final long OTP_EXPIRATION_MS = 5 * 60 * 1000; // 5 phút
+    private final long OTP_EXPIRATION_MS = 5 * 60 * 1000;
 
     @Override
     public String sendOtp(ForgotPasswordRequest request) {
@@ -49,21 +49,41 @@ public class ForgotPasswordServiceImpl implements ForgotPasswordService {
     }
 
     @Override
-    public String resetPassword(ResetPasswordRequest request) {
-
-        ForgotPassword fp = forgotPasswordRepo.findByOtp(request.getOtp())
+    public String verifyOtp(int otp) {
+        ForgotPassword fp = forgotPasswordRepo.findByOtp(otp)
                 .orElseThrow(() -> new OtpInvalidException("OTP không đúng"));
 
         if (fp.getExpirationTime().before(new Date())) {
             throw new OtpExpiredException("OTP đã hết hạn");
         }
 
-        Account account = fp.getAccount();
+        // Có thể đánh dấu OTP đã verify nếu muốn
+        fp.setVerified(true);
+        forgotPasswordRepo.save(fp);
 
-        account.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        return "OTP hợp lệ";
+    }
+
+    @Override
+    public String resetPassword(int otp, String newPassword) {
+        // Lấy bản ghi OTP
+        ForgotPassword fp = forgotPasswordRepo.findByOtp(otp)
+                .orElseThrow(() -> new OtpInvalidException("OTP không đúng"));
+
+        // Kiểm tra OTP đã verify chưa
+        if (fp.getExpirationTime().before(new Date())) {
+            throw new OtpExpiredException("OTP đã hết hạn");
+        }
+
+        if (fp.getVerified() == null || !fp.getVerified()) {
+            throw new OtpNotVerifiedException("OTP chưa được xác thực");
+        }
+
+        Account account = fp.getAccount();
+        account.setPassword(passwordEncoder.encode(newPassword));
         accountRepo.save(account);
 
-        // Xoá OTP sau khi dùng
+        // Xóa OTP sau khi dùng
         forgotPasswordRepo.delete(fp);
 
         return "Đổi mật khẩu thành công";

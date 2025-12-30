@@ -1,6 +1,7 @@
 package com.jobportal.backend.Controller;
 
 import com.jobportal.backend.Dto.AuthRequest;
+import com.jobportal.backend.Dto.AuthResponse;
 import com.jobportal.backend.Dto.RegisterRequest;
 import com.jobportal.backend.Service.AuthService;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +21,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public String login(@RequestBody AuthRequest request) {
+    public AuthResponse login(@RequestBody AuthRequest request) {
         return authService.login(request);
     }
 }

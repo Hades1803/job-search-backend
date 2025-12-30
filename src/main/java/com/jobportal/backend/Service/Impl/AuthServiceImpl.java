@@ -1,6 +1,7 @@
 package com.jobportal.backend.Service.Impl;
 
 import com.jobportal.backend.Dto.AuthRequest;
+import com.jobportal.backend.Dto.AuthResponse;
 import com.jobportal.backend.Dto.RegisterRequest;
 import com.jobportal.backend.Entity.*;
 import com.jobportal.backend.Repository.AccountRepo;
@@ -29,7 +30,7 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     @Transactional
-    public String register(RegisterRequest request) {
+    public String register(RegisterRequest request) {   
         // Check if email already exists
         if (accountRepo.findByEmail(request.getEmail()).isPresent()) {
             throw new IllegalArgumentException("Email already registered");
@@ -58,7 +59,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public String login(AuthRequest request) {
+    public AuthResponse login(AuthRequest request) {
         Account acc = accountRepo.findByEmail(request.getEmail())
                 .orElseThrow(() -> new IllegalArgumentException("Invalid email or password"));
 
@@ -70,20 +71,30 @@ public class AuthServiceImpl implements AuthService {
             throw new IllegalArgumentException("Invalid email or password");
         }
 
-        return jwtUtil.generateToken(acc.getEmail());
+        String accessToken = jwtUtil.generateToken(acc.getEmail());
+
+        return AuthResponse.builder()
+                .accessToken(accessToken)
+                .tokenType("Bearer")
+                .email(acc.getEmail())
+                .role(acc.getRole().getName().name())
+                .expiresIn(jwtUtil.getExpiration())
+                .message("Login successful")
+                .build();
     }
+
 
     private void createCandidateProfile(Account account) {
         Candidate candidate = new Candidate();
         candidate.setAccount(account);
-        // Tất cả các trường khác để null, sẽ cập nhật sau
+
         candidateRepo.save(candidate);
     }
 
     private void createEmployerProfile(Account account) {
         Employer employer = new Employer();
         employer.setAccount(account);
-        // Tất cả các trường khác để null, sẽ cập nhật sau
         employerRepo.save(employer);
     }
+
 }

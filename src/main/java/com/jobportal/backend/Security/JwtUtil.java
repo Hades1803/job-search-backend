@@ -16,7 +16,7 @@ public class JwtUtil {
 
     @Value("${jwt_secret}")
     private String secret;
-
+    private static final long EXPIRATION_TIME = 1000L * 60 * 60 * 24;
     private final String ISSUER = "JobPortalSystem";
 
     public String generateToken(String email) {
@@ -25,12 +25,15 @@ public class JwtUtil {
                     .withSubject("User Details")
                     .withClaim("email", email)
                     .withIssuedAt(new Date())
-                    .withExpiresAt(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24))
+                    .withExpiresAt(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
                     .withIssuer(ISSUER)
                     .sign(Algorithm.HMAC256(secret));
         } catch (JWTCreationException ex) {
             throw new RuntimeException("JWT creation failed!");
         }
+    }
+    public long getExpiration() {
+        return EXPIRATION_TIME / 1000;
     }
 
     public String validateTokenAndRetrieveSubject(String token) {

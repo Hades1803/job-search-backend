@@ -9,5 +9,6 @@ public interface ForgotPasswordService {
 
     String sendOtp(ForgotPasswordRequest request);
 
-    String resetPassword(ResetPasswordRequest request);
+    String resetPassword(int otp, String newPassword);
+    String verifyOtp(int otp);
 }
