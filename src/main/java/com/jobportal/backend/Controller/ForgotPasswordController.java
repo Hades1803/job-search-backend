@@ -6,6 +6,8 @@ import com.jobportal.backend.Service.ForgotPasswordService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
@@ -14,21 +16,22 @@ public class ForgotPasswordController {
 
     private final ForgotPasswordService forgotPasswordService;
 
-    // Bước 1: gửi OTP
+
     @PostMapping("/forgot-password")
     public String forgotPassword(@RequestBody ForgotPasswordRequest request) {
         return forgotPasswordService.sendOtp(request);
     }
 
-    // Bước 2: verify OTP
+
     @PostMapping("/verify-otp")
-    public String verifyOtp(@RequestParam int otp) {
+    public String verifyOtp(@RequestBody Map<String, Integer> request) {
+        int otp = request.get("otp");
         return forgotPasswordService.verifyOtp(otp);
     }
 
-    // Bước 3: reset password (sau khi OTP đã verify)
     @PostMapping("/reset-password")
-    public String resetPassword(@RequestParam int otp, @RequestBody ResetPasswordRequest request) {
+    public String resetPassword(@RequestBody ResetPasswordRequest request) {
+        int otp = request.getOtp(); // thêm trường otp trong DTO
         return forgotPasswordService.resetPassword(otp, request.getNewPassword());
     }
 }

@@ -25,7 +25,7 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        // Public endpoints
+
                         .requestMatchers(
                                 "/api/auth/**",
                                 "/api/public/**",
@@ -35,7 +35,6 @@ public class SecurityConfig {
                                 "/error"
                         ).permitAll()
 
-                        // SỬA: Dùng đúng authority name (không có "ROLE_" prefix)
                         .requestMatchers("/api/admin/**").hasAuthority("ADMIN")
                         .requestMatchers("/api/employer/**").hasAuthority("EMPLOYER")
                         .requestMatchers("/api/candidate/**").hasAuthority("CANDIDATE")
