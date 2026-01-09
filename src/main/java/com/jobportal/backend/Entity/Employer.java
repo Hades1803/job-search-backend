@@ -15,8 +15,6 @@ public class Employer {
 
     @Id
     private Integer id;
-
-
     @OneToOne
     @MapsId
     @JoinColumn(name = "id")

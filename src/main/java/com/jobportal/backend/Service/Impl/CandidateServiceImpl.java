@@ -45,11 +45,11 @@ public class CandidateServiceImpl implements CandidateService {
         Candidate candidate = candidateRepo.findById(account.getId())
                 .orElseGet(() -> {
                     Candidate newCandidate = new Candidate();
-                    newCandidate.setAccount(account); // @MapsId sẽ tự set id
+                    newCandidate.setAccount(account);
                     return newCandidate;
                 });
 
-        // Cập nhật thông tin
+
         candidate.setName(request.getName().trim());
         candidate.setPhone(request.getPhone());
         candidate.setGender(request.getGender());

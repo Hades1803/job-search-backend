@@ -1,4 +1,5 @@
 package com.jobportal.backend.Entity;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Size;
@@ -49,6 +50,7 @@ public class Account {
 
 
     @OneToOne(mappedBy = "account", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
     private Employer employer;
 
     @Column(name = "last_login_at")

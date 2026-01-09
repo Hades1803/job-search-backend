@@ -38,6 +38,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/admin/**").hasAuthority("ADMIN")
                         .requestMatchers("/api/employer/**").hasAuthority("EMPLOYER")
                         .requestMatchers("/api/candidate/**").hasAuthority("CANDIDATE")
+                        .requestMatchers("/api/employers/**").hasAuthority("EMPLOYER")
 
                         .anyRequest().authenticated()
                 )
