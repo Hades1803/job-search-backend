@@ -14,6 +14,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/majors")
 @RequiredArgsConstructor
+@CrossOrigin("*")
 public class MajorController {
 
     private final MajorService majorService;

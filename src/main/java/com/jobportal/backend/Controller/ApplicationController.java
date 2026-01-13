@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/applications")
 @RequiredArgsConstructor
-@CrossOrigin
+@CrossOrigin("*")
 public class ApplicationController {
 
     private final ApplicationService applicationService;

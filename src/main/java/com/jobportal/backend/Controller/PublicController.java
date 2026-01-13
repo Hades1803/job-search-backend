@@ -11,6 +11,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/public")
 @RequiredArgsConstructor
+@CrossOrigin("*")
 public class PublicController {
 
     private final MajorService majorService;

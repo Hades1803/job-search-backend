@@ -11,7 +11,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
-@CrossOrigin
+@CrossOrigin("*")
 public class ForgotPasswordController {
 
     private final ForgotPasswordService forgotPasswordService;

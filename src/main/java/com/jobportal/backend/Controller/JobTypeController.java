@@ -14,6 +14,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/job-types")
 @RequiredArgsConstructor
+@CrossOrigin("*")
 public class JobTypeController {
 
     private final JobTypeService jobTypeService;

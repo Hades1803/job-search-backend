@@ -11,6 +11,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/candidate/resumes")
 @RequiredArgsConstructor
+@CrossOrigin("*")
 public class ResumeController {
 
     private final ResumeService resumeService;

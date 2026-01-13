@@ -1,57 +1,37 @@
 package com.jobportal.backend.Controller;
 
+import com.jobportal.backend.Dto.EmployerProfileRequest;
 import com.jobportal.backend.Entity.Account;
 import com.jobportal.backend.Entity.Employer;
 import com.jobportal.backend.Repository.AccountRepo;
 import com.jobportal.backend.Service.EmployerService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
+
 @RestController
-@RequestMapping("/api/employers")
+@RequestMapping("/api/employer")
 @RequiredArgsConstructor
-@CrossOrigin
+@CrossOrigin("*")
 public class EmployerController {
 
     private final EmployerService employerService;
-    private final AccountRepo accountRepo;
-    @PostMapping
-
-    public Employer createEmployer(
-            @RequestBody Employer employer,
-            Authentication authentication) {
-
-        String email = authentication.getName();
-        Account account = accountRepo.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Account not found"));
-
-        return employerService.createEmployer(employer, account);
-    }
-
-    @PutMapping
-    public Employer updateEmployer(
-            @RequestBody Employer employer,
-            Authentication authentication) {
-
-        // Lấy email từ Authentication
-        String email = authentication.getName();
-
-        // Lấy Account managed từ DB
-        Account managedAccount = accountRepo.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Account not found"));
-
-        // Truyền managedAccount vào service
-        return employerService.updateEmployer(employer, managedAccount);
-    }
-
 
     @GetMapping("/me")
+    public ResponseEntity<Employer> getMyEmployer() {
+        return ResponseEntity.ok(employerService.getMyEmployer());
+    }
 
-    public Employer getMyEmployer(Authentication authentication) {
+    @PutMapping(value = "/me", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<Employer> updateEmployer(
+            @ModelAttribute EmployerProfileRequest request
+    ) throws IOException {
 
-        Account account = (Account) authentication.getPrincipal();
-        return employerService.getMyEmployer(account);
+        return ResponseEntity.ok(employerService.updateEmployer(request));
     }
 }
