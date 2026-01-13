@@ -70,7 +70,9 @@ public class CandidateServiceImpl implements CandidateService {
 
     @Override
     public Candidate getMyProfile() {
-        return null;
+        Account currentAccount = getCurrentAccount();
+        return candidateRepo.findById(currentAccount.getId())
+                .orElseThrow(() -> new RuntimeException("Candidate profile not found"));
     }
 
     private Account getCurrentAccount() {

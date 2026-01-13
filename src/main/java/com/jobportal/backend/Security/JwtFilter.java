@@ -28,8 +28,18 @@ public class JwtFilter extends OncePerRequestFilter {
 
         String path = request.getServletPath();
 
-        if (path.startsWith("/api/auth")
-                || path.startsWith("/api/public")) {
+        if (
+                path.startsWith("/api/auth") ||
+                        path.startsWith("/api/public") ||
+                        path.startsWith("/api/job-types") ||
+                        path.startsWith("/api/ranks") ||
+                        path.startsWith("/api/salary-levels") ||
+                        path.startsWith("/api/majors") ||
+                        path.startsWith("/api/addresses") ||
+                        path.startsWith("/api/job-postings/public") ||
+                        path.startsWith("/uploads") ||
+                        path.equals("/error")
+        ) {
             filterChain.doFilter(request, response);
             return;
         }

@@ -33,6 +33,11 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/api/auth/**",
                                 "/api/public/**",
+                                "/api/ranks/**",
+                                "/api/salary-levels/**",
+                                "/api/job-types/**",
+                                "/api/majors/**",
+                                "/api/addresses/**",
                                 "/api/job-postings/public/**",
                                 "/uploads/**",
                                 "/error"

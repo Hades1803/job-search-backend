@@ -236,12 +236,12 @@ public class JobPostingServiceImpl implements JobPostingService {
         JobPosting job = jobPostingRepo.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy bài đăng tuyển dụng ID: " + id));
 
-        if (securityUtils.isAdmin()) {
+        if (!securityUtils.isAdmin()) {
             jobPostingRepo.delete(job);
             return;
         }
 
-        if (securityUtils.isEmployer()) {
+        if (!securityUtils.isEmployer()) {
             Employer employer = getCurrentEmployer();
             if (!job.getEmployer().getId().equals(employer.getId())) {
                 throw new AccessDeniedException("Bạn chỉ có thể xóa bài đăng của mình");

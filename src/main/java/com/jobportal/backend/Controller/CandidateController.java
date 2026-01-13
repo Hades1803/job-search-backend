@@ -19,9 +19,10 @@ public class CandidateController {
     private final CandidateService candidateService;
 
     @GetMapping("/me")
-    public Candidate getMyProfile() {
-        return candidateService.getMyProfile();
+    public ResponseEntity<Candidate> getMyProfile() {
+        return ResponseEntity.ok(candidateService.getMyProfile());
     }
+
 
     @PutMapping(value = "/me", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Candidate> updateMyProfile(
