@@ -12,6 +12,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfigurationSource;
 
 @Configuration
 @EnableMethodSecurity(prePostEnabled = true)
@@ -19,11 +20,14 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
 
     private final JwtFilter jwtFilter;
+    private final CorsConfigurationSource corsConfigurationSource;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+
         http
                 .csrf(csrf -> csrf.disable())
+                .cors(cors -> cors.configurationSource(corsConfigurationSource))
                 .authorizeHttpRequests(auth -> auth
 
                         .requestMatchers(
@@ -31,14 +35,13 @@ public class SecurityConfig {
                                 "/api/public/**",
                                 "/api/job-postings/public/**",
                                 "/uploads/**",
-                                "/api/job-postings/public/**",
                                 "/error"
                         ).permitAll()
 
                         .requestMatchers("/api/admin/**").hasAuthority("ADMIN")
                         .requestMatchers("/api/employer/**").hasAuthority("EMPLOYER")
-                        .requestMatchers("/api/candidate/**").hasAuthority("CANDIDATE")
                         .requestMatchers("/api/employers/**").hasAuthority("EMPLOYER")
+                        .requestMatchers("/api/candidate/**").hasAuthority("CANDIDATE")
 
                         .anyRequest().authenticated()
                 )
@@ -53,7 +56,9 @@ public class SecurityConfig {
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
+    public AuthenticationManager authenticationManager(
+            AuthenticationConfiguration configuration
+    ) throws Exception {
         return configuration.getAuthenticationManager();
     }
 }
