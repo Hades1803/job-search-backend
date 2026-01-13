@@ -18,7 +18,8 @@ public class CorsConfig {
         config.setAllowedOrigins(List.of(
                 "http://localhost:3000",
                 "http://localhost:5173",
-                "https://job-search-frontend.onrender.com"
+                "https://job-search-frontend.onrender.com",
+                "https://job-search-frontend-two.vercel.app"
         ));
 
         config.setAllowedMethods(List.of(
