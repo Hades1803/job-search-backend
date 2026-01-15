@@ -1,67 +1,36 @@
 package com.jobportal.backend.Entity;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.time.LocalDateTime;
 
 
 @Entity
 @Table(name = "resumes")
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 public class Resume {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-
-    @Size(max = 200)
     private String resumeName;
 
+    private String templateCode;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "candidate_id", nullable = false)
     private Candidate candidate;
 
-
-    @ManyToOne
-    @JoinColumn(name = "major_id")
-    private Major major;
-
-
-    @ManyToOne
-    @JoinColumn(name = "job_type_id")
-    private JobType jobType;
-
-
-    @ManyToOne
-    @JoinColumn(name = "rank_id")
-    private Rank rank;
-
-
+    @Lob
     @Column(columnDefinition = "TEXT")
-    private String careerObjective;
+    private String content;
 
 
-    @Column(columnDefinition = "TEXT")
-    private String experience;
-
-
-    @Size(max = 500)
-    private String skills;
-
-
-    @Column(columnDefinition = "TEXT")
-    private String education;
-
-
-    @Size(max = 500)
-    private String softSkills;
-
-
-    @Size(max = 500)
-    private String awards;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 }

@@ -5,6 +5,7 @@ import com.jobportal.backend.Entity.Resume;
 
 import java.util.List;
 
+
 public interface ResumeService {
 
     Resume createResume(ResumeRequest request);

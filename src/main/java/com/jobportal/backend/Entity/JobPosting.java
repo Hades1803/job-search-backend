@@ -91,4 +91,6 @@ public class JobPosting {
     @Size(max = 500)
     private String note;
     private Boolean status = true;
+
+    private Boolean isActive;
 }

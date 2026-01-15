@@ -1,9 +1,13 @@
 package com.jobportal.backend.Service.Impl;
 
 import com.jobportal.backend.Dto.ResumeRequest;
-import com.jobportal.backend.Entity.*;
+import com.jobportal.backend.Entity.Account;
+import com.jobportal.backend.Entity.Candidate;
+import com.jobportal.backend.Entity.Resume;
 import com.jobportal.backend.Exception.ResourceNotFoundException;
-import com.jobportal.backend.Repository.*;
+import com.jobportal.backend.Repository.AccountRepo;
+import com.jobportal.backend.Repository.CandidateRepo;
+import com.jobportal.backend.Repository.ResumeRepo;
 import com.jobportal.backend.Service.ResumeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
@@ -11,6 +15,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -21,9 +26,8 @@ public class ResumeServiceImpl implements ResumeService {
     private final ResumeRepo resumeRepository;
     private final CandidateRepo candidateRepo;
     private final AccountRepo accountRepo;
-    private final MajorRepo majorRepository;
-    private final JobTypeRepo jobTypeRepository;
-    private final RankRepo rankRepository;
+
+    // ================== PUBLIC ==================
 
     @Override
     public Resume createResume(ResumeRequest request) {
@@ -31,6 +35,9 @@ public class ResumeServiceImpl implements ResumeService {
 
         Resume resume = new Resume();
         resume.setCandidate(candidate);
+        resume.setCreatedAt(LocalDateTime.now());
+        resume.setUpdatedAt(LocalDateTime.now());
+
         mapData(resume, request);
 
         return resumeRepository.save(resume);
@@ -39,7 +46,10 @@ public class ResumeServiceImpl implements ResumeService {
     @Override
     public Resume updateResume(Integer resumeId, ResumeRequest request) {
         Resume resume = getResumeOwnedByCandidate(resumeId);
+        resume.setUpdatedAt(LocalDateTime.now());
+
         mapData(resume, request);
+
         return resumeRepository.save(resume);
     }
 
@@ -64,27 +74,8 @@ public class ResumeServiceImpl implements ResumeService {
 
     private void mapData(Resume resume, ResumeRequest request) {
         resume.setResumeName(request.getResumeName());
-        resume.setCareerObjective(request.getCareerObjective());
-        resume.setExperience(request.getExperience());
-        resume.setSkills(request.getSkills());
-        resume.setEducation(request.getEducation());
-        resume.setSoftSkills(request.getSoftSkills());
-        resume.setAwards(request.getAwards());
-
-        if (request.getMajorId() != null) {
-            resume.setMajor(majorRepository.findById(request.getMajorId())
-                    .orElseThrow(() -> new ResourceNotFoundException("Major không tồn tại")));
-        }
-
-        if (request.getJobTypeId() != null) {
-            resume.setJobType(jobTypeRepository.findById(request.getJobTypeId())
-                    .orElseThrow(() -> new ResourceNotFoundException("JobType không tồn tại")));
-        }
-
-        if (request.getRankId() != null) {
-            resume.setRank(rankRepository.findById(request.getRankId())
-                    .orElseThrow(() -> new ResourceNotFoundException("Rank không tồn tại")));
-        }
+        resume.setTemplateCode(request.getTemplateCode());
+        resume.setContent(request.getContent());
     }
 
     private Resume getResumeOwnedByCandidate(Integer resumeId) {
@@ -101,8 +92,11 @@ public class ResumeServiceImpl implements ResumeService {
     }
 
     private Candidate getCurrentCandidate() {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String email = auth.getName();
+        Authentication authentication = SecurityContextHolder
+                .getContext()
+                .getAuthentication();
+
+        String email = authentication.getName();
 
         Account account = accountRepo.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("Account không tồn tại"));
