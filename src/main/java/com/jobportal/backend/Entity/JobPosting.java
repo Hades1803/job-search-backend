@@ -92,5 +92,5 @@ public class JobPosting {
     private String note;
     private Boolean status = true;
 
-    private Boolean isActive;
+//    private Boolean isActive;
 }
