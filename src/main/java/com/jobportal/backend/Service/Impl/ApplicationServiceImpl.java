@@ -1,6 +1,7 @@
 package com.jobportal.backend.Service.Impl;
 
 import com.jobportal.backend.Dto.ApplyJobRequest;
+import com.jobportal.backend.Dto.JobApplicationResponse;
 import com.jobportal.backend.Dto.MyApplicationResponse;
 import com.jobportal.backend.Entity.*;
 import com.jobportal.backend.Repository.*;
@@ -10,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -18,6 +20,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class ApplicationServiceImpl implements ApplicationService {
 
     private final ApplicationRepo applicationRepository;
@@ -90,9 +93,27 @@ public class ApplicationServiceImpl implements ApplicationService {
     }
 
     @Override
-    public List<Application> getApplicationsByJob(Integer jobId) {
-        return applicationRepository.findByJobPosting_Id(jobId);
+    @Transactional(readOnly = true)
+    public List<JobApplicationResponse> getApplicationsByJob(Integer jobId) {
+
+        return applicationRepository
+                .findByJobPostingWithCandidate(jobId)
+                .stream()
+                .map(app -> {
+                    JobApplicationResponse dto = new JobApplicationResponse();
+                    dto.setApplicationId(app.getId());
+                    dto.setCandidateId(app.getCandidate().getId());
+                    dto.setCandidateName(app.getCandidate().getName());
+                    dto.setCandidateEmail(app.getCandidate().getAccount().getEmail());
+                    dto.setResumeType(app.getResumeType().name());
+                    dto.setStatus(app.getStatus().name());
+                    dto.setApplyDate(app.getApplyDate());
+                    return dto;
+                })
+                .toList();
     }
+
+
 
     @Override
     public List<MyApplicationResponse> getMyApplications() {
@@ -119,5 +140,27 @@ public class ApplicationServiceImpl implements ApplicationService {
             dto.setApplyDate(app.getApplyDate());
             return dto;
         }).toList();
+    }
+
+    @Override
+    public void updateApplicationStatus(
+            Integer applicationId,
+            ApplicationStatus status
+    ) {
+
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String email = auth.getName();
+
+        Application application = applicationRepository.findById(applicationId)
+                .orElseThrow(() -> new RuntimeException("Application không tồn tại"));
+
+
+        Employer employer = application.getJobPosting().getEmployer();
+        if (!employer.getAccount().getEmail().equals(email)) {
+            throw new RuntimeException("Bạn không có quyền cập nhật trạng thái ứng tuyển này");
+        }
+
+        application.setStatus(status);
+        applicationRepository.save(application);
     }
 }

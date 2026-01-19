@@ -25,4 +25,21 @@ public interface ApplicationRepo extends JpaRepository<Application,Integer> {
     WHERE a.candidate.id = :candidateId
 """)
     List<Application> findMyApplications(@Param("candidateId") Integer candidateId);
+
+    @Query("""
+    select a from Application a
+    join fetch a.candidate c
+    where a.jobPosting.id = :jobId
+""")
+    List<Application> findByJobWithCandidate(@Param("jobId") Integer jobId);
+
+    @Query("""
+    select a
+    from Application a
+    join fetch a.candidate c
+    where a.jobPosting.id = :jobId
+""")
+    List<Application> findByJobPostingWithCandidate(Integer jobId);
+
+
 }
