@@ -19,7 +19,14 @@ public class EmailServiceImpl implements EmailService {
             message.setTo(to);
             message.setSubject(subject);
             message.setText(content);
-            message.setFrom("your_email@gmail.com"); // Email gửi đi
+
+            // Lấy email gửi từ biến môi trường
+            String fromEmail = System.getenv("MAIL_FROM");
+            if (fromEmail == null || fromEmail.isEmpty()) {
+                fromEmail = "no-reply@jobportal.com"; // fallback
+            }
+            message.setFrom(fromEmail);
+
             mailSender.send(message);
             System.out.println("✔ Email sent to " + to);
         } catch (Exception e) {
