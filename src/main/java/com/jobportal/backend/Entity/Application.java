@@ -28,17 +28,17 @@ public class Application {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "resume_id")
-    private Resume resume; // Có thể null nếu dùng file upload
+    private Resume resume;
 
     private String resumeLink;
 
-    // Thêm các field mới
-    private String uploadedCVPath; // Đường dẫn file upload
-    private String uploadedCVName; // Tên file upload
+
+    private String uploadedCVPath;
+    private String uploadedCVName;
 
     @Column(name = "resume_type")
     @Enumerated(EnumType.STRING)
-    private ResumeType resumeType; // Loại resume sử dụng
+    private ResumeType resumeType;
 
     private LocalDateTime applyDate;
 

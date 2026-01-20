@@ -50,7 +50,16 @@ public class FileServiceImpl implements FileService {
 
     public String uploadImageCloud(MultipartFile file) throws IOException {
         Map uploadResult = cloudinary.uploader().upload(file.getBytes(),
-                ObjectUtils.asMap("job-portal", "jobportal/images"));
+                ObjectUtils.asMap("folder", "jobportal/images"));
         return uploadResult.get("secure_url").toString();
     }
+
+
+    public String uploadCv(MultipartFile file) throws IOException {
+
+        Map<String, Object> options = ObjectUtils.asMap( "resource_type", "raw", "upload_preset", "cv_public" );
+        Map uploadResult = cloudinary.uploader() .upload(file.getBytes(), options);
+        return uploadResult.get("secure_url").toString();
+    }
+
 }

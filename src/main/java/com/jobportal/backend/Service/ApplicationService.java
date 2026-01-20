@@ -18,4 +18,5 @@ public interface ApplicationService {
 
     List<MyApplicationResponse> getMyApplications();
     void updateApplicationStatus(Integer applicationId, ApplicationStatus status);
+    String getResumeByApplicationId(Integer applicationId);
 }

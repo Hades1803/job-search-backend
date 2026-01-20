@@ -47,4 +47,13 @@ public class ApplicationController {
         applicationService.updateApplicationStatus(id, status);
         return ResponseEntity.ok("Cập nhật trạng thái ứng tuyển thành công");
     }
+
+
+    @GetMapping("/{applicationId}/resume")
+    public ResponseEntity<String> getResume(@PathVariable Integer applicationId) {
+        String resumeContentOrLink = applicationService.getResumeByApplicationId(applicationId);
+        return ResponseEntity.ok(resumeContentOrLink);
+    }
+
+
 }

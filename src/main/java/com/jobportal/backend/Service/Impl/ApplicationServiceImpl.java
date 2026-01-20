@@ -62,10 +62,9 @@ public class ApplicationServiceImpl implements ApplicationService {
             application.setResumeType(Application.ResumeType.DB_RESUME);
 
         } else if (request.getCvFile() != null && !request.getCvFile().isEmpty()) {
-            // Upload CV lên Cloudinary
             String cvUrl;
             try {
-                cvUrl = fileService.uploadImageCloud(request.getCvFile());
+                cvUrl = fileService.uploadCv(request.getCvFile());
             } catch (IOException e) {
                 throw new RuntimeException("Upload CV thất bại");
             }
@@ -112,8 +111,6 @@ public class ApplicationServiceImpl implements ApplicationService {
                 })
                 .toList();
     }
-
-
 
     @Override
     public List<MyApplicationResponse> getMyApplications() {
@@ -163,4 +160,36 @@ public class ApplicationServiceImpl implements ApplicationService {
         application.setStatus(status);
         applicationRepository.save(application);
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public String getResumeByApplicationId(Integer applicationId) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String email = auth.getName();
+
+        Application application = applicationRepository.findById(applicationId)
+                .orElseThrow(() -> new RuntimeException("Application không tồn tại"));
+
+        Employer employer = application.getJobPosting().getEmployer();
+        if (!employer.getAccount().getEmail().equals(email)) {
+            throw new RuntimeException("Bạn không có quyền xem CV của ứng viên này");
+        }
+
+        if (application.getResumeType() == null) {
+            throw new RuntimeException("Resume chưa được đính kèm");
+        }
+
+        return switch (application.getResumeType()) {
+            case DB_RESUME -> {
+                Resume resume = application.getResume();
+                if (resume == null) throw new RuntimeException("Resume trong DB không tồn tại");
+                yield resume.getContent();
+            }
+            case UPLOADED_FILE -> application.getUploadedCVPath();
+            case LINK_ONLY -> application.getResumeLink();
+        };
+    }
+
+
+
 }
