@@ -19,7 +19,8 @@ public class CorsConfig {
                 "http://localhost:3000",
                 "http://localhost:5173",
                 "https://job-search-frontend.onrender.com",
-                "https://job-search-frontend-two.vercel.app"
+                "https://job-search-frontend-two.vercel.app",
+                "https://job-portal-admin-flax.vercel.app"
         ));
 
         config.setAllowedMethods(List.of(
