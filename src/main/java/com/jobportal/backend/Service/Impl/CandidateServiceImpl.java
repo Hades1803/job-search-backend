@@ -54,18 +54,18 @@ public class CandidateServiceImpl implements CandidateService {
         candidate.setBirthDate(request.getBirthDate());
         candidate.setAddress(request.getAddress());
 
-        // Upload avatar
+        // Upload avatar lên Cloudinary
         MultipartFile avatarFile = request.getAvatarFile();
         if (avatarFile != null && !avatarFile.isEmpty()) {
-            String fileName = fileService.uploadImage(imagePath, avatarFile);
-            candidate.setAvatar("/uploads/images/" + fileName);
+            String avatarUrl = fileService.uploadImageCloud(avatarFile);
+            candidate.setAvatar(avatarUrl);
         }
 
-        // Upload cover image
+        // Upload cover image lên Cloudinary
         MultipartFile coverFile = request.getCoverImageFile();
         if (coverFile != null && !coverFile.isEmpty()) {
-            String fileName = fileService.uploadImage(imagePath, coverFile);
-            candidate.setCoverImage("/uploads/images/" + fileName);
+            String coverUrl = fileService.uploadImageCloud(coverFile);
+            candidate.setCoverImage(coverUrl);
         }
 
         return candidateRepo.save(candidate);

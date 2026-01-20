@@ -1,7 +1,10 @@
 package com.jobportal.backend.Service.Impl;
 
 
+import com.cloudinary.Cloudinary;
+import com.cloudinary.utils.ObjectUtils;
 import com.jobportal.backend.Service.FileService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -9,10 +12,14 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Map;
 import java.util.UUID;
 
 @Service
+@RequiredArgsConstructor
 public class FileServiceImpl implements FileService {
+
+    private final Cloudinary cloudinary;
 
     @Override
     public String uploadImage(String path, MultipartFile file) throws IOException {
@@ -39,5 +46,11 @@ public class FileServiceImpl implements FileService {
     public InputStream getResource(String path, String fileName) throws FileNotFoundException {
         Path filePath = Paths.get(path, fileName);
         return new FileInputStream(filePath.toFile());
+    }
+
+    public String uploadImageCloud(MultipartFile file) throws IOException {
+        Map uploadResult = cloudinary.uploader().upload(file.getBytes(),
+                ObjectUtils.asMap("job-portal", "jobportal/images"));
+        return uploadResult.get("secure_url").toString();
     }
 }

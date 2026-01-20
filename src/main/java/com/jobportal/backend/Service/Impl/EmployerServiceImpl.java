@@ -47,18 +47,21 @@ public class EmployerServiceImpl implements EmployerService {
         existing.setAddress(request.getAddress());
         existing.setWebsite(request.getWebsite());
 
+        // Upload logo lên Cloudinary
         if (request.getLogoFile() != null && !request.getLogoFile().isEmpty()) {
-            String logoName = fileService.uploadImage(imagePath, request.getLogoFile());
-            existing.setLogoImage("/uploads/images/" + logoName);
+            String logoUrl = fileService.uploadImageCloud(request.getLogoFile());
+            existing.setLogoImage(logoUrl);
         }
 
+        // Upload cover image lên Cloudinary
         if (request.getCoverFile() != null && !request.getCoverFile().isEmpty()) {
-            String coverName = fileService.uploadImage(imagePath, request.getCoverFile());
-            existing.setCoverImage("/uploads/images/" + coverName);
+            String coverUrl = fileService.uploadImageCloud(request.getCoverFile());
+            existing.setCoverImage(coverUrl);
         }
 
         return employerRepository.save(existing);
     }
+
 
     @Override
     @Transactional(readOnly = true)

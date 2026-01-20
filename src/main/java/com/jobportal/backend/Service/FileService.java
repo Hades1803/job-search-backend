@@ -12,4 +12,6 @@ public interface FileService {
 
     // Lấy file từ server (để download hoặc hiển thị)
     InputStream getResource(String path, String fileName) throws FileNotFoundException;
+
+    String uploadImageCloud(MultipartFile file) throws IOException;
 }

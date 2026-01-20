@@ -54,6 +54,7 @@ public class ApplicationServiceImpl implements ApplicationService {
         application.setStatus(ApplicationStatus.PENDING);
 
         if (request.getResumeId() != null) {
+            // Sử dụng resume từ DB
             Resume resume = resumeRepository.findById(request.getResumeId())
                     .orElseThrow(() -> new RuntimeException("Resume không tồn tại"));
 
@@ -61,21 +62,19 @@ public class ApplicationServiceImpl implements ApplicationService {
             application.setResumeType(Application.ResumeType.DB_RESUME);
 
         } else if (request.getCvFile() != null && !request.getCvFile().isEmpty()) {
-
-            String uploadPath = "uploads/cv";
-            String fileName;
-
+            // Upload CV lên Cloudinary
+            String cvUrl;
             try {
-                fileName = fileService.uploadImage(uploadPath, request.getCvFile());
+                cvUrl = fileService.uploadImageCloud(request.getCvFile());
             } catch (IOException e) {
                 throw new RuntimeException("Upload CV thất bại");
             }
 
-            application.setUploadedCVName(fileName);
-            application.setUploadedCVPath("/uploads/cv/" + fileName);
+            application.setUploadedCVPath(cvUrl);
             application.setResumeType(Application.ResumeType.UPLOADED_FILE);
 
         } else if (request.getResumeLink() != null && !request.getResumeLink().isBlank()) {
+            // Sử dụng link CV
             application.setResumeLink(request.getResumeLink());
             application.setResumeType(Application.ResumeType.LINK_ONLY);
 
@@ -85,6 +84,7 @@ public class ApplicationServiceImpl implements ApplicationService {
 
         return applicationRepository.save(application);
     }
+
 
 
     @Override
