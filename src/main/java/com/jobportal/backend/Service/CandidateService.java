@@ -4,6 +4,7 @@ import com.jobportal.backend.Dto.CandidateProfileRequest;
 import com.jobportal.backend.Entity.Candidate;
 
 import java.io.IOException;
+import java.util.List;
 
 public interface CandidateService {
 
@@ -11,4 +12,5 @@ public interface CandidateService {
 
     Candidate updateMyProfile(CandidateProfileRequest request) throws IOException;
     Candidate getMyProfile();
+    List<Candidate> getAllCandidatesForAdmin();
 }

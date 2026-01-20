@@ -3,6 +3,8 @@ package com.jobportal.backend.Service.Impl;
 import com.jobportal.backend.Dto.CandidateProfileRequest;
 import com.jobportal.backend.Entity.Account;
 import com.jobportal.backend.Entity.Candidate;
+import com.jobportal.backend.Entity.Employer;
+import com.jobportal.backend.Entity.RoleType;
 import com.jobportal.backend.Exception.ResourceNotFoundException;
 import com.jobportal.backend.Repository.AccountRepo;
 import com.jobportal.backend.Repository.CandidateRepo;
@@ -17,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -80,5 +83,11 @@ public class CandidateServiceImpl implements CandidateService {
         String email = auth.getName();
         return accountRepo.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("Account không tồn tại"));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Candidate> getAllCandidatesForAdmin() {
+        return candidateRepo.findAllCandidatesOnly();
     }
 }

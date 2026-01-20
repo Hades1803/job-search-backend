@@ -13,6 +13,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/employer")
@@ -33,5 +34,10 @@ public class EmployerController {
     ) throws IOException {
 
         return ResponseEntity.ok(employerService.updateEmployer(request));
+    }
+
+    @GetMapping("/admin/employers")
+    public List<Employer> getAllEmployers() {
+        return employerService.getAllEmployersForAdmin();
     }
 }

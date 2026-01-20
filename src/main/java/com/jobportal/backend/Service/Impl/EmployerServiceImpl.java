@@ -8,6 +8,7 @@ import com.jobportal.backend.Repository.AccountRepo;
 import com.jobportal.backend.Repository.EmployerRepo;
 import com.jobportal.backend.Service.EmployerService;
 import com.jobportal.backend.Service.FileService;
+import com.jobportal.backend.Utils.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -25,7 +27,6 @@ public class EmployerServiceImpl implements EmployerService {
     private final EmployerRepo employerRepository;
     private final AccountRepo accountRepo;
     private final FileService fileService;
-
     @Value("${project.image}")
     private String imagePath;
 
@@ -73,4 +74,11 @@ public class EmployerServiceImpl implements EmployerService {
         return accountRepo.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Account not found"));
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Employer> getAllEmployersForAdmin() {
+        return employerRepository.findAllEmployersOnly();
+    }
+
 }

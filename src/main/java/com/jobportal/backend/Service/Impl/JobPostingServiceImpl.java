@@ -353,16 +353,19 @@ public class JobPostingServiceImpl implements JobPostingService {
 
     @Override
     public Page<JobPosting> getAllJobPostings(Pageable pageable) {
-        if (!securityUtils.isAdmin()) {
+
+        log.info("DEBUG isEmployer = {}", securityUtils.isAdmin());
+        if (securityUtils.isAdmin()) {
             throw new AccessDeniedException("Chỉ quản trị viên mới có thể xem tất cả bài đăng");
         }
 
-        return jobPostingRepo.findAll(pageable);
+        return jobPostingRepo.findAllWithEmployer(pageable);
     }
+
 
     @Override
     public JobPosting toggleJobPostingStatus(Integer id) {
-        if (securityUtils.isAdmin()) {
+        if (!securityUtils.isAdmin()) {
             throw new AccessDeniedException("Chỉ quản trị viên mới có thể thay đổi trạng thái bài đăng");
         }
 

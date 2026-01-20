@@ -6,6 +6,7 @@ import com.jobportal.backend.Entity.Account;
 import com.jobportal.backend.Dto.EmployerProfileRequest;
 
 import java.io.IOException;
+import java.util.List;
 
 public interface EmployerService {
 
@@ -14,4 +15,6 @@ public interface EmployerService {
     Employer updateEmployer(EmployerProfileRequest request) throws IOException;
 
     Employer getMyEmployer();
+
+    List<Employer> getAllEmployersForAdmin();
 }
