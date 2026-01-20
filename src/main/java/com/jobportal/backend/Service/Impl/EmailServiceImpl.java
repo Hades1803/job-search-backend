@@ -19,6 +19,16 @@ public class EmailServiceImpl implements EmailService {
 
     @Override
     public void sendEmail(String to, String subject, String content) {
+
+        System.out.println("========== SEND EMAIL DEBUG ==========");
+        System.out.println("MAIL_FROM = " + FROM_EMAIL);
+        System.out.println("TO = " + to);
+        System.out.println("SUBJECT = " + subject);
+        System.out.println("SENDGRID_API_KEY exists = " + (SENDGRID_API_KEY != null));
+        System.out.println("SENDGRID_API_KEY length = " +
+                (SENDGRID_API_KEY != null ? SENDGRID_API_KEY.length() : "null"));
+        System.out.println("======================================");
+
         Email from = new Email(FROM_EMAIL);
         Email toEmail = new Email(to);
         Content emailContent = new Content("text/plain", content);
@@ -31,11 +41,27 @@ public class EmailServiceImpl implements EmailService {
             request.setMethod(Method.POST);
             request.setEndpoint("mail/send");
             request.setBody(mail.build());
+
             Response response = sg.api(request);
-            System.out.println("Email sent! Status: " + response.getStatusCode());
-        } catch (IOException ex) {
-            System.out.println("❌ Failed to send email to " + to + ": " + ex.getMessage());
+
+            System.out.println("========== SENDGRID RESPONSE ==========");
+            System.out.println("Status Code: " + response.getStatusCode());
+            System.out.println("Response Body: " + response.getBody());
+            System.out.println("Response Headers: " + response.getHeaders());
+            System.out.println("======================================");
+
+            // 🚨 BẮT BUỘC kiểm tra status
+            if (response.getStatusCode() < 200 || response.getStatusCode() >= 300) {
+                throw new RuntimeException("SendGrid rejected email, status=" + response.getStatusCode());
+            }
+
+            System.out.println("✅ Email sent successfully");
+
+        } catch (Exception ex) {
+            System.out.println("❌ Failed to send email");
+            ex.printStackTrace();
             throw new RuntimeException("Cannot send email via SendGrid API");
         }
     }
+
 }

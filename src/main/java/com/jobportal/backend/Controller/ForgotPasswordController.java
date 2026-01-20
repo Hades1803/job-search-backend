@@ -2,6 +2,7 @@ package com.jobportal.backend.Controller;
 
 import com.jobportal.backend.Dto.ForgotPasswordRequest;
 import com.jobportal.backend.Dto.ResetPasswordRequest;
+import com.jobportal.backend.Service.EmailService;
 import com.jobportal.backend.Service.ForgotPasswordService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -15,11 +16,16 @@ import java.util.Map;
 public class ForgotPasswordController {
 
     private final ForgotPasswordService forgotPasswordService;
-
+    private final EmailService emailService;
 
     @PostMapping("/forgot-password")
     public String forgotPassword(@RequestBody ForgotPasswordRequest request) {
         return forgotPasswordService.sendOtp(request);
+    }
+    @GetMapping("/test-email")
+    public String testEmail() {
+        emailService.sendEmail("anhquoc3241@gmail.com", "Test SendGrid", "Hello from local!");
+        return "Sent test email!";
     }
 
 
