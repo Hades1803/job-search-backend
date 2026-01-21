@@ -3,6 +3,7 @@ package com.jobportal.backend.Controller;
 import com.jobportal.backend.Dto.ApplyJobRequest;
 import com.jobportal.backend.Dto.JobApplicationResponse;
 import com.jobportal.backend.Dto.MyApplicationResponse;
+import com.jobportal.backend.Dto.ResumeResponse;
 import com.jobportal.backend.Entity.Application;
 import com.jobportal.backend.Entity.ApplicationStatus;
 import com.jobportal.backend.Service.ApplicationService;
@@ -50,8 +51,8 @@ public class ApplicationController {
 
 
     @GetMapping("/{applicationId}/resume")
-    public ResponseEntity<String> getResume(@PathVariable Integer applicationId) {
-        String resumeContentOrLink = applicationService.getResumeByApplicationId(applicationId);
+    public ResponseEntity<ResumeResponse> getResume(@PathVariable Integer applicationId) {
+        ResumeResponse resumeContentOrLink = applicationService.getResumeByApplicationId(applicationId);
         return ResponseEntity.ok(resumeContentOrLink);
     }
 

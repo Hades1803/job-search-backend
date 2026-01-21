@@ -3,6 +3,7 @@ package com.jobportal.backend.Service.Impl;
 import com.jobportal.backend.Dto.ApplyJobRequest;
 import com.jobportal.backend.Dto.JobApplicationResponse;
 import com.jobportal.backend.Dto.MyApplicationResponse;
+import com.jobportal.backend.Dto.ResumeResponse;
 import com.jobportal.backend.Entity.*;
 import com.jobportal.backend.Repository.*;
 import com.jobportal.backend.Service.ApplicationService;
@@ -163,7 +164,8 @@ public class ApplicationServiceImpl implements ApplicationService {
 
     @Override
     @Transactional(readOnly = true)
-    public String getResumeByApplicationId(Integer applicationId) {
+    public ResumeResponse getResumeByApplicationId(Integer applicationId) {
+
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String email = auth.getName();
 
@@ -175,20 +177,24 @@ public class ApplicationServiceImpl implements ApplicationService {
             throw new RuntimeException("Bạn không có quyền xem CV của ứng viên này");
         }
 
-        if (application.getResumeType() == null) {
+        if (application.getResumeType() == null || application.getResume() == null) {
             throw new RuntimeException("Resume chưa được đính kèm");
         }
 
-        return switch (application.getResumeType()) {
-            case DB_RESUME -> {
-                Resume resume = application.getResume();
-                if (resume == null) throw new RuntimeException("Resume trong DB không tồn tại");
-                yield resume.getContent();
-            }
-            case UPLOADED_FILE -> application.getUploadedCVPath();
-            case LINK_ONLY -> application.getResumeLink();
-        };
+        Resume resume = application.getResume();
+
+        ResumeResponse response = new ResumeResponse();
+        response.setId(resume.getId());
+        response.setResumeName(resume.getResumeName());
+        response.setTemplateCode(resume.getTemplateCode());
+        response.setContent(resume.getContent());
+        response.setUpdatedAt(resume.getUpdatedAt());
+
+        return response;
     }
+
+
+
 
 
 

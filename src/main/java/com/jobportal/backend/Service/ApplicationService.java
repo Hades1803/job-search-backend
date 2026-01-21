@@ -3,6 +3,7 @@ package com.jobportal.backend.Service;
 import com.jobportal.backend.Dto.ApplyJobRequest;
 import com.jobportal.backend.Dto.JobApplicationResponse;
 import com.jobportal.backend.Dto.MyApplicationResponse;
+import com.jobportal.backend.Dto.ResumeResponse;
 import com.jobportal.backend.Entity.Application;
 import com.jobportal.backend.Entity.ApplicationStatus;
 
@@ -18,5 +19,5 @@ public interface ApplicationService {
 
     List<MyApplicationResponse> getMyApplications();
     void updateApplicationStatus(Integer applicationId, ApplicationStatus status);
-    String getResumeByApplicationId(Integer applicationId);
+    ResumeResponse getResumeByApplicationId(Integer applicationId);
 }
