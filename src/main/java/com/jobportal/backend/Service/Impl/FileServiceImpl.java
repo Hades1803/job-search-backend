@@ -2,6 +2,7 @@ package com.jobportal.backend.Service.Impl;
 
 
 import com.cloudinary.Cloudinary;
+import com.cloudinary.Transformation;
 import com.cloudinary.utils.ObjectUtils;
 import com.jobportal.backend.Service.FileService;
 import lombok.RequiredArgsConstructor;
@@ -55,11 +56,35 @@ public class FileServiceImpl implements FileService {
     }
 
 
+    @Override
     public String uploadCv(MultipartFile file) throws IOException {
 
-        Map<String, Object> options = ObjectUtils.asMap( "resource_type", "raw", "upload_preset", "cv_public" );
-        Map uploadResult = cloudinary.uploader() .upload(file.getBytes(), options);
-        return uploadResult.get("secure_url").toString();
+        Map<String, Object> options = ObjectUtils.asMap(
+                "resource_type", "auto",
+                "folder", "jobportal/cv"
+        );
+
+        Map uploadResult = cloudinary.uploader()
+                .upload(file.getBytes(), options);
+
+        // ⚠️ LƯU public_id, KHÔNG LƯU secure_url
+        return uploadResult.get("public_id").toString();
     }
+
+    @Override
+    public String generateCvPreviewUrl(String publicId) {
+
+        return cloudinary.url()
+                .resourceType("image")   // render PDF → image
+                .format("jpg")
+                .transformation(new Transformation()
+                        .page(1)
+                        .width(800)
+                        .crop("fit")
+                )
+                .secure(true)
+                .generate(publicId);
+    }
+
 
 }

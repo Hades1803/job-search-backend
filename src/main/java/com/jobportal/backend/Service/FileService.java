@@ -15,4 +15,5 @@ public interface FileService {
 
     String uploadImageCloud(MultipartFile file) throws IOException;
     String uploadCv(MultipartFile file) throws IOException;
+    String generateCvPreviewUrl(String publicId);
 }

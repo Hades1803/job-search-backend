@@ -177,21 +177,48 @@ public class ApplicationServiceImpl implements ApplicationService {
             throw new RuntimeException("Bạn không có quyền xem CV của ứng viên này");
         }
 
-        if (application.getResumeType() == null || application.getResume() == null) {
-            throw new RuntimeException("Resume chưa được đính kèm");
+        Application.ResumeType type = application.getResumeType();
+        if (type == null) {
+            throw new RuntimeException("Application chưa có resume");
         }
 
-        Resume resume = application.getResume();
-
         ResumeResponse response = new ResumeResponse();
-        response.setId(resume.getId());
-        response.setResumeName(resume.getResumeName());
-        response.setTemplateCode(resume.getTemplateCode());
-        response.setContent(resume.getContent());
-        response.setUpdatedAt(resume.getUpdatedAt());
+        response.setResumeType(type.name());
+
+        switch (type) {
+
+            case DB_RESUME -> {
+                Resume resume = application.getResume();
+                if (resume == null) {
+                    throw new RuntimeException("Resume DB không tồn tại");
+                }
+
+                response.setId(resume.getId());
+                response.setResumeName(resume.getResumeName());
+                response.setTemplateCode(resume.getTemplateCode());
+                response.setContent(resume.getContent());
+                response.setUpdatedAt(resume.getUpdatedAt());
+            }
+
+            case UPLOADED_FILE -> {
+                response.setCvPreviewUrl(
+                        fileService.generateCvPreviewUrl(
+                                application.getUploadedCVPath()
+                        )
+                );
+            }
+
+            case LINK_ONLY -> {
+                response.setResumeLink(application.getResumeLink());
+            }
+
+            default -> throw new RuntimeException("Resume type không hợp lệ");
+        }
 
         return response;
     }
+
+
 
 
 
